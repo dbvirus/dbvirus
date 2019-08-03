@@ -5,6 +5,11 @@ from Bio import Entrez
 
 
 class Searcher:
+    """
+    Searcher is the first DBVirus component. Its main purpose
+    is to provide an API for searching SRA and caching the
+    results from its queries.
+    """
     def __init__(self, email, api_key=None, db="sra"):
         self.api_key = api_key
         self.db = db

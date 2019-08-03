@@ -9,6 +9,7 @@ license = "MIT"
 python = "^3.7"
 biopython = "^1.74"
 xmltodict = "^0.12"
+mongoengine = "^0.18.2"
 
 [tool.poetry.dev-dependencies]
 pylint = "^2.3"
