@@ -4,7 +4,7 @@ and do not make any sort of HTTP request.
 """
 # pylint: disable=redefined-outer-name
 import io
-
+from pathlib import Path
 from Bio import Entrez
 from searcher import Searcher
 
@@ -60,3 +60,21 @@ def test_searcher_returns_dictionary(searcher: Searcher, mocker):
     Entrez.esearch.return_value = io.StringIO("{}")
     result = searcher.search("Human", max_results=3)
     assert isinstance(result, dict)
+
+
+def test_fetch_result(searcher: Searcher, mocker):
+    """
+    Given an Entrez UID, the searcher must acquire the related data
+    """
+    mocker.patch("Bio.Entrez.efetch")
+    Entrez.efetch.return_value = open(
+        Path(__file__).parent.absolute().joinpath("sample_efetch_result.xml")
+    )
+
+    data = searcher.fetch("8801091")
+
+    # pylint: disable=no-member
+    Entrez.efetch.assert_called()
+
+    assert data
+    assert isinstance(data, dict)
