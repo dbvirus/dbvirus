@@ -20,6 +20,8 @@ class Searcher:
         Entrez.email = self.email
         Entrez.api_key = self.api_key
 
+        self._result = None
+
     def search(self, query, max_results=10):
         """
         Searches NCBI for a given query and returns the result in json
