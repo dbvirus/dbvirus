@@ -1,18 +1,12 @@
 """
-Unit tests for the searcher module
+Unit tests for the searcher module. Those tests mock the Entrez class
+and do not make any sort of HTTP request.
 """
 # pylint: disable=redefined-outer-name
-import pytest
+import io
+
 from Bio import Entrez
 from searcher import Searcher
-
-
-@pytest.fixture
-def searcher():
-    """
-    Fixture that provides a Searcher instance
-    """
-    return Searcher("test@test.com")
 
 
 def test_searcher_initialization(searcher):
@@ -33,14 +27,20 @@ def test_searcher_searches_sra(searcher: Searcher, mocker):
     calls the correct Biopython's Entrez methods
     """
 
+    # We need to supply a return value to the esearch function.
+    # That return value must be a buffer.
     mocker.patch("Bio.Entrez.esearch")
+    Entrez.esearch.return_value = io.StringIO("{}")
+
     searcher.search('"Homo sapiens"[Organism]')
 
     # pylint: disable=no-member
-    Entrez.esearch.assert_called_with("sra", '"Homo sapiens"[Organism]', retmax=1)
+    Entrez.esearch.assert_called_with(
+        "sra", '"Homo sapiens"[Organism]', retmax=10, retmode="json"
+    )
 
 
-def test_searcher_configurer_entrez(mocker):
+def test_searcher_configurer_entrez():
     """
     In order for everything to work, the Searcher must set Entrez's e-mail and
     API Key parameters
@@ -50,3 +50,13 @@ def test_searcher_configurer_entrez(mocker):
 
     assert Entrez.email == "test@test.com"
     assert Entrez.api_key == "3141516"
+
+
+def test_searcher_returns_dictionary(searcher: Searcher, mocker):
+    """
+    The searcher must return a json formatted SRA resultset
+    """
+    mocker.patch("Bio.Entrez.esearch")
+    Entrez.esearch.return_value = io.StringIO("{}")
+    result = searcher.search("Human", max_results=3)
+    assert isinstance(result, dict)
