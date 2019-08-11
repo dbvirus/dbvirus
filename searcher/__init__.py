@@ -2,8 +2,13 @@
 Supplies the main Searcher service
 """
 from json import loads
-from xmltodict import parse
+
 from Bio import Entrez
+from mongoengine import connect, connection
+from pymongo.errors import ServerSelectionTimeoutError
+from xmltodict import parse
+
+from .cacher.documents import SearchResult, EntrezItem
 
 
 class Searcher:
@@ -13,7 +18,7 @@ class Searcher:
     results from its queries.
     """
 
-    def __init__(self, email, api_key=None, db="sra"):
+    def __init__(self, email, api_key=None, db="sra", mongo_url=None):
         self.api_key = api_key
         self.db = db
         self.email = email
@@ -22,6 +27,15 @@ class Searcher:
 
         self._result = None
 
+        if mongo_url:
+            try:
+                connect(host=mongo_url)
+                connection.get_connection().server_info()
+            except ServerSelectionTimeoutError:
+                self.cached = False
+            else:
+                self.cached = True
+
     def search(self, query, max_results=10):
         """
         Searches NCBI for a given query and returns the result in json
@@ -29,6 +43,10 @@ class Searcher:
         handle = Entrez.esearch(self.db, query, retmax=max_results, retmode="json")
         result = loads(handle.read())
         self._result = result
+
+        if self.cached:
+            SearchResult(**result).save()
+
         return result
 
     def search_human_rna(self, read_length=50):
@@ -49,9 +67,19 @@ class Searcher:
 
         https://www.ncbi.nlm.nih.gov/books/NBK25499/#_chapter4_EFetch_
         """
+        if self.cached and EntrezItem.objects(uid=uid):
+            return loads(EntrezItem.objects(uid=uid)[0].to_json())
+
         handle = Entrez.efetch(id=uid, db=self.db, rettype="full", retmode="xml")
         data = handle.read()
-        return parse(data)
+        data = parse(data)
+        data["uid"] = uid
+
+        if self.cached:
+            data = EntrezItem(**data).save()
+            data = loads(data.to_json())
+
+        return data
 
     def __getitem__(self, key):
         """
