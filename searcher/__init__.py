@@ -26,7 +26,7 @@ class Searcher:
         Entrez.api_key = self.api_key
 
         self._result = None
-
+        self.cached = False
         if mongo_url:
             try:
                 connect(host=mongo_url)
@@ -36,11 +36,11 @@ class Searcher:
             else:
                 self.cached = True
 
-    def search(self, query, max_results=10):
+    def search(self, query, max_results=10, **kwargs):
         """
         Searches NCBI for a given query and returns the result in json
         """
-        handle = Entrez.esearch(self.db, query, retmax=max_results, retmode="json")
+        handle = Entrez.esearch(self.db, query, retmax=max_results, retmode="json", **kwargs)
         result = loads(handle.read())
         self._result = result
 
