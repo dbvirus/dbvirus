@@ -6,7 +6,7 @@ import fire
 from searcher import Searcher
 
 
-def main(email, api_key=None, query=None):
+def main(email, api_key=None, query=None, mongo_url=None, download_all=False, **kwargs):
     """
     Given an e-mail and API key, searches for Human RNA and outputs the result
     """
@@ -18,13 +18,15 @@ def main(email, api_key=None, query=None):
     """
     )
 
-    searcher = Searcher(email, api_key=api_key)
+    searcher = Searcher(email, api_key=api_key, mongo_url=mongo_url)
 
     if query:
-        searcher.search(query)
+        searcher.search(query, **kwargs)
     else:
         searcher.search_human_rna()
-    print(searcher[0])
+
+    if download_all:
+        assert searcher.cached, "Searcher is not cached."
 
 
 if __name__ == "__main__":

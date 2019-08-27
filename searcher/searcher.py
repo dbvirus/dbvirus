@@ -8,13 +8,13 @@ from mongoengine import connect, connection
 from pymongo.errors import ServerSelectionTimeoutError
 from xmltodict import parse
 
-from .cacher.documents import SearchResult, EntrezItem
+from cacher.documents import SearchResult, EntrezItem
 
 
 class Searcher:
     """
-    Searcher is the first DBVirus component. Its main purpose
-    is to provide an API for searching SRA and caching the
+    Searcher is the first DBVirus component. Its main purpose is to
+    provide an API for searching NCBI databases and caching the
     results from its queries.
     """
 
@@ -54,7 +54,7 @@ class Searcher:
 
         return result
 
-    def search_human_rna(self, read_length=50):
+    def search_human_rna(self, read_length=50, **kwargs):
         """
         Queries SRA for _Homo sapiens_ RNA sequences
         """
@@ -64,7 +64,7 @@ class Searcher:
             '(cluster_public[prop] AND "biomol rna"[Properties])'
         )
 
-        return self.search(query)
+        return self.search(query, **kwargs)
 
     def fetch(self, uid):
         """
