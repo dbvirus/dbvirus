@@ -7,12 +7,14 @@ from datetime import datetime
 from mongoengine import *
 from pytz import utc
 
+
 class SearchResult(DynamicDocument):
     """
     Mongoengine document to hold search results
     """
 
     created_at = DateTimeField(default=datetime.now(utc))
+
 
 class EntrezItem(DynamicDocument):
     """
@@ -21,4 +23,3 @@ class EntrezItem(DynamicDocument):
 
     created_at = DateTimeField(default=datetime.now(utc))
     uid = StringField()
-    

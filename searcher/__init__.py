@@ -39,7 +39,6 @@ class Searcher:
         else:
             self.cached = False
 
-
     def search(self, query, max_results=10, **kwargs):
         """
         Searches NCBI for a given query and returns the result in json

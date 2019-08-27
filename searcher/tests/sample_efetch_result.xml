@@ -135,7 +135,7 @@
                 </IDENTIFIERS>
                 <EXPERIMENT_REF accession="SRX6673505">
                     <IDENTIFIERS/>
-                </EXPERIMENT_REF>               
+                </EXPERIMENT_REF>
                 <Pool>
                     <Member member_name="" accession="SRS5232408" sample_name="Huh7" spots="9914797" bases="495739850" tax_id="9606" organism="Homo sapiens">
                         <IDENTIFIERS>
