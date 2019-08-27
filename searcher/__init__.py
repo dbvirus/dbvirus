@@ -72,6 +72,7 @@ class Searcher:
 
         https://www.ncbi.nlm.nih.gov/books/NBK25499/#_chapter4_EFetch_
         """
+        # pylint: disable=no-member
         if self.cached and EntrezItem.objects(uid=uid):
             return loads(EntrezItem.objects(uid=uid)[0].to_json())
 

@@ -1,7 +1,7 @@
 """
 Mongoengine documents used for caching
 """
-# pylint: disable=wildcard-import, unused-wildcard-import
+# pylint: disable=wildcard-import, unused-wildcard-import, no-member
 from datetime import datetime
 
 from mongoengine import *
