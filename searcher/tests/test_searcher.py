@@ -14,7 +14,7 @@ def test_searcher_initialization(searcher):
     Tests a searcher initialization parameters
     """
 
-    assert searcher
+    assert isinstance(searcher, Searcher)
     assert searcher.db == "sra"
 
     new_searcher = Searcher("another@test.com", db="other_db")

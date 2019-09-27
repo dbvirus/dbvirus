@@ -21,4 +21,4 @@ RUN poetry config settings.virtualenvs.create false \
 
 COPY . /code
 
-ENTRYPOINT [ "python", "-m", "searcher" ]
+ENTRYPOINT [ "python", "searcher" ]
