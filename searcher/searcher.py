@@ -39,13 +39,11 @@ class Searcher:
         else:
             self.cached = False
 
-    def search(self, query, max_results=10, **kwargs):
+    def search(self, query, limit=10, **kwargs):
         """
         Searches NCBI for a given query and returns the result in json
         """
-        handle = Entrez.esearch(
-            self.db, query, retmax=max_results, retmode="json", **kwargs
-        )
+        handle = Entrez.esearch(self.db, query, retmax=limit, retmode="json", **kwargs)
         result = loads(handle.read())
         self._result = result
 
@@ -94,3 +92,12 @@ class Searcher:
         """
         assert self._result, "Please, make a query first."
         return self.fetch(self._result["esearchresult"]["idlist"][key])
+
+    def __len__(self):
+        """
+        A Searcher len will be its last query's result size
+        """
+        if not (self._result and self._result["esearchresult"]["idlist"]):
+            return 0
+
+        return len(self._result["esearchresult"]["idlist"])
