@@ -12,6 +12,7 @@ xmltodict = "^0.12"
 mongoengine = "^0.18.2"
 fire = "^0.2.1"
 pytz = "^2019.2"
+tqdm = "^4.36"
 
 [tool.poetry.dev-dependencies]
 pylint = "^2.3"
