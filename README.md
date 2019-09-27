@@ -1,5 +1,8 @@
 # DB Virus
 
+[![Maintainability](https://api.codeclimate.com/v1/badges/35e1406de7bd3e0a656b/maintainability)](https://codeclimate.com/github/dbvirus/dbvirus/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/35e1406de7bd3e0a656b/test_coverage)](https://codeclimate.com/github/dbvirus/dbvirus/test_coverage)
+
 Pipeline for transcriptomic data analysis with the goal of identifying novel virus sequences in publicly available data.
 
 ## Architecture
