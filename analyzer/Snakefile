@@ -1,0 +1,57 @@
+PRE = "transcripts"
+SAMPLE = "read"
+FASTA = "reference/{0}.fasta.gz".format(PRE)
+INDEX = "reference/{0}.kidx".format(PRE)
+
+rule all:
+    input:
+        "diamond_out_1.outfmt6"
+
+#rule index:
+#    input: FASTA
+#    output: INDEX
+#    conda:
+#        "envs/kallisto.yaml"
+#    shell:
+#        "kallisto index -i {output} {input}"
+
+rule kallisto_quant:
+    input:
+        "data/reads_1.fastq.gz",
+        "data/reads_2.fastq.gz",
+        INDEX
+    output:
+        directory("kallisto_out")
+    conda:
+        "envs/kallisto.yaml"
+    shell:
+        "kallisto quant "
+        "-i {INDEX} "
+        "-b 30 "
+        "-o {output[0]} "
+        "--pseudobam "
+        "{input[0]} {input[1]}"
+
+rule filter_not_aligned:
+    input:
+        "kallisto_out"
+    output:
+        "unmapped_1.fq",
+        "unmapped_2.fq"
+    conda:
+        "envs/kallisto.yaml"
+    shell:
+        "samtools view -u -f 12 -F 256 {input}/pseudoalignments.bam | bamToFastq -i /dev/stdin -fq {output[0]} -fq2 {output[1]}"
+
+rule run_diamond:
+    input:
+        "unmapped_1.fq",
+        "unmapped_2.fq"
+    output:
+        "diamond_out_1.outfmt6",
+        "diamond_out_2.outfmt6"
+    conda:
+        "envs/diamond.yaml"
+    shell:
+        "diamond blastx -d reference/nr -q {input[0]} --outfmt 6 -o {output[0]}",
+        "diamond blastx -d reference/nr -q {input[1]} --outfmt 6 -o {output[1]}"

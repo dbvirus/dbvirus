@@ -1,0 +1,6 @@
+channels:
+  - bioconda
+dependencies:
+  - kallisto =0.46
+  - bedtools =2.29
+  - samtools =1.9
