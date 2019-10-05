@@ -20,8 +20,8 @@ rule index:
 
 rule kallisto_quant:
     input:
-        "data/"+config['SAMPLE']+"_1.fastq.gz",
-        "data/"+config['SAMPLE']+"_2.fastq.gz",
+        "data/"+config['SAMPLE']+"_1.fastq",
+        "data/"+config['SAMPLE']+"_2.fastq",
         INDEX
     output:
         "data/kallisto_out"
