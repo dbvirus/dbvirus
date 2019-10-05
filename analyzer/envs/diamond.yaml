@@ -1,4 +1,4 @@
 channels:
   - bioconda
 dependencies:
-  - diamond
+  - diamond =0.9.26
