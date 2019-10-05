@@ -1,12 +1,14 @@
 PRE = "transcripts"
-SAMPLE = "read"
+#SAMPLE = "read"
 FASTA = "reference/{0}.fasta.gz".format(PRE)
 INDEX = "reference/{0}.kidx".format(PRE)
 NR_DB = "reference/nr"
 
+configfile: "config.yaml"
+
 rule all:
     input:
-        "diamond_out_1.outfmt102"
+        "data/diamond_out_1.outfmt102"
 
 rule index:
     input: FASTA
@@ -18,11 +20,11 @@ rule index:
 
 rule kallisto_quant:
     input:
-        "data/reads_1.fastq.gz",
-        "data/reads_2.fastq.gz",
+        "data/"+config['SAMPLE']+"_1.fastq.gz",
+        "data/"+config['SAMPLE']+"_2.fastq.gz",
         INDEX
     output:
-        directory("kallisto_out")
+        "data/kallisto_out"
     conda:
         "envs/kallisto.yaml"
     shell:
@@ -35,10 +37,10 @@ rule kallisto_quant:
 
 rule filter_not_aligned:
     input:
-        "kallisto_out"
+        "data/kallisto_out"
     output:
-        "unmapped_1.fq",
-        "unmapped_2.fq"
+        "data/unmapped_1.fq",
+        "data/unmapped_2.fq"
     conda:
         "envs/kallisto.yaml"
     shell:
@@ -56,12 +58,12 @@ rule diamond_make:
 
 rule run_diamond:
     input:
-        "unmapped_1.fq",
-        "unmapped_2.fq",
+        "data/unmapped_1.fq",
+        "data/unmapped_2.fq",
         "reference/nr.dmnd"
     output:
-        "diamond_out_1.outfmt102",
-        "diamond_out_2.outfmt102"
+        "data/diamond_out_1.outfmt102",
+        "data/diamond_out_2.outfmt102"
     conda:
         "envs/diamond.yaml"
     shell:
