@@ -2,7 +2,7 @@ PRE = "transcripts"
 #SAMPLE = "read"
 FASTA = "reference/{0}.fasta.gz".format(PRE)
 INDEX = "reference/{0}.kidx".format(PRE)
-NR_DB = "reference/nr"
+NR_DB = "reference/nr.gz"
 
 configfile: "config.yaml"
 
