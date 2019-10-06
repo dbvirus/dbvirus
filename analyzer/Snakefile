@@ -24,7 +24,7 @@ rule kallisto_quant:
         "data/"+config['SAMPLE']+"_2.fastq",
         INDEX
     output:
-        "data/kallisto_out"
+        directory("data/kallisto_out")
     conda:
         "envs/kallisto.yaml"
     shell:
