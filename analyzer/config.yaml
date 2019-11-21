@@ -1,1 +1,7 @@
-SAMPLE: "reads"
+sample: "reads"
+
+reference: "transcripts.fasta.gz"
+
+prot_db: "nr.gz"
+
+threads: 1

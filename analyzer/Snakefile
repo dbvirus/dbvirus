@@ -1,18 +1,18 @@
-PRE = "transcripts"
-#SAMPLE = "read"
-FASTA = "reference/{0}.fasta.gz".format(PRE)
-INDEX = "reference/{0}.kidx".format(PRE)
-NR_DB = "reference/nr.gz"
-
 configfile: "config.yaml"
+
+sample = config['sample']
+host_transcripts = config['reference']
+prot_db = config['prot_db']
+host_index = f"{host_transcripts}.kidx"
+num_threads = config['threads']
 
 rule all:
     input:
         "data/diamond_out_1.outfmt102"
 
 rule index:
-    input: FASTA
-    output: INDEX
+    input: host_transcripts
+    output: host_index
     conda:
         "envs/kallisto.yaml"
     shell:
@@ -20,20 +20,21 @@ rule index:
 
 rule kallisto_quant:
     input:
-        "data/"+config['SAMPLE']+"_1.fastq",
-        "data/"+config['SAMPLE']+"_2.fastq",
-        INDEX
+        host_index
+        f"data/{sample}_1.fastq",
+        f"data/{sample}_2.fastq",
     output:
         directory("data/kallisto_out")
     conda:
         "envs/kallisto.yaml"
+    threads: num_threads
     shell:
         "kallisto quant "
-        "-i {INDEX} "
-        "-b 30 "
+        "-i {input[0]} "
+        "-b 0 "
         "-o {output[0]} "
         "--pseudobam "
-        "{input[0]} {input[1]}"
+        "{input[1]} {input[2]}"
 
 rule filter_not_aligned:
     input:
@@ -44,17 +45,20 @@ rule filter_not_aligned:
     conda:
         "envs/kallisto.yaml"
     shell:
-        "samtools view -u -f 12 -F 256 {input}/pseudoalignments.bam | bamToFastq -i /dev/stdin -fq {output[0]} -fq2 {output[1]}"
+        "samtools view -u -f 12 -F 256 {input}/pseudoalignments.bam "
+        "| bamToFastq -i /dev/stdin -fq {output[0]} -fq2 {output[1]}"
 
 rule diamond_make:
     input:
-        NR_DB
+        prot_db
     output:
         "reference/nr.dmnd"
     conda:
         "envs/diamond.yaml"
+    threads: num_threads
     shell:
-        "diamond makedb --in {input} -d {output} --taxonmap reference/prot.accession2taxid.gz --taxonnodes reference/nodes.dmp"
+        "diamond makedb --threads {threads} --in {input} -d {output} --taxonmap "
+        "reference/prot.accession2taxid.gz --taxonnodes reference/nodes.dmp"
 
 rule run_diamond:
     input:
@@ -66,8 +70,9 @@ rule run_diamond:
         "data/diamond_out_2.outfmt102"
     conda:
         "envs/diamond.yaml"
+    threads: num_threads
     shell:
         """
-        diamond blastx -d {input[2]} -q {input[0]} --outfmt 102 -o {output[0]}
-        diamond blastx -d {input[2]} -q {input[1]} --outfmt 102 -o {output[1]}
+        diamond blastx --threads {threads} -d {input[2]} -q {input[0]} --outfmt 102 -o {output[0]}
+        diamond blastx --threads {threads} -d {input[2]} -q {input[1]} --outfmt 102 -o {output[1]}
         """
